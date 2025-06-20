@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+*.pyd
+*.so
+
+# Virtual envs
+.env
+.venv
+venv/
+
+# Build artifacts
+build/
+dist/
+*.wheel
+
+# Test cache
+.pytest_cache/
+
+# IDEs
+.idea/
+.vscode/
+
+# Conda environment
+*.conda
+
+# OS files
+.DS_Store
+
+# Coverage
+htmlcov/
+.coverage

@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as follows:"
+title: "United Agent Protocol"
+version: 0.1.0
+authors:
+  - family-names: Klein
+    given-names: Timo
+    affiliation: WhoMeta Inc.
+date-released: 2025-06-20
+repository-code: https://github.com/whometa/united-agent-protocol
+url: https://whometa.io/uap
+license: MIT
+keywords:
+  - agent protocol
+  - interoperability
+  - unified interface
+  - tool standard
+  - open agent spec
