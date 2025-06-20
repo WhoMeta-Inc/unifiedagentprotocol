@@ -1,7 +1,7 @@
 # Unified Agent Protocol (UAP) – Core SDK Specification
 
 **Version**: 0.1 Alpha  
-**Maintained by**: [WhoMeta Labs](https://www.whometa.io)  
+**Maintained by**: [WhoMeta Labs part of WhoMeta Inc.](https://www.whometa.io)  
 **License**: Apache 2.0  
 **Language**: Python 3.10+  
 **Repository**: _Private/internal (planned public release Q3 2025)_
@@ -89,3 +89,30 @@ These bridges allow **inter-protocol operability** – for example, developers c
 ```bash
 # Convert OpenWebUI tools into MCP-ready format
 uap bind --input tools_openwebui.json --format mcp > mcp_payload.json
+```  
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are **very welcome**!
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feat/awesome-feature`)
+3. Commit your changes (`git commit -m 'feat: add awesome feature'`)
+4. Push to the branch (`git push origin feat/awesome-feature`)
+5. Open a pull request
+
+For full guidelines, please read the [CONTRIBUTE guide](contribute.md).
+
+---
+
+## ⚖️ License
+
+This project is licensed under the **Apache License 2.0** – see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📑 Changelog
+
+All notable changes will be documented in [CHANGELOG.md](CHANGELOG.md).
