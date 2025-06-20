@@ -1,0 +1,27 @@
+{
+  "name": "greeter-agent",
+  "description": "Agent that can greet users via the hello tool.",
+  "tools": [
+    {
+      "name": "hello_tool",
+      "description": "Greets a user by name.",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Name of the person to greet"
+        }
+      ],
+      "output": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "greeting": {"type": "string"}
+          }
+        }
+      },
+      "triggers": [{"type": "manual"}]
+    }
+  ]
+}

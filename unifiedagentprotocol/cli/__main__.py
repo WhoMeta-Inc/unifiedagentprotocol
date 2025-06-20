@@ -37,6 +37,17 @@ def bind(
     """Convert an existing definition into a UAP export format."""
 
     data = json.loads(input.read_text())
+
+    # OpenWebUI marketplace exports are wrapped in a list of objects that carry a
+    # `tool` key. Accept such payloads by unwrapping the first element so that
+    # the generic parser continues to work.
+    if isinstance(data, list):
+        if not data:
+            typer.echo("Input list is empty – nothing to convert", err=True)
+            raise typer.Exit(code=1)
+        first = data[0]
+        data = first.get("tool", first)
+
     # TODO: add format detection / parser mapping
     tool_or_agent = parse_openwebui(data)  # placeholder
 

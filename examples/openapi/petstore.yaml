@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: Petstore (Minimal)
+  version: "1.0.0"
+  description: Example OpenAPI document for UAP demo
+paths:
+  /pets:
+    get:
+      summary: List pets
+      description: Returns a list of pets.
+      operationId: listPets
+      responses:
+        "200":
+          description: An array of pets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pets:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Pet"
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string

@@ -41,7 +41,7 @@ Common challenges include:
   - `parse_openapi(spec)`: Map OpenAPI endpoints to UAP tools.
 - 📤 **Export bridges**:
   - `to_a2a(agent)`: Generate A2A-compatible payload.
-  - `to_mcp(agent)`: Convert to Microsoft Copilot MCP schema.
+  - `to_mcp(agent)`: Convert to Model Context Protocol (MCP) schema.
   - `to_openapi(tool)`: Derive standard OpenAPI spec from UAP tool.
 - 🖥️ **CLI (`uap bind`)**:
   - Run transformations via command-line: `uap bind --input tools.json --format mcp`
@@ -77,7 +77,7 @@ All objects are implemented as subclasses of `pydantic.BaseModel` and support:
 | Target Protocol | Bridge | Status | Description |
 |-----------------|--------|--------|-------------|
 | A2A (Agent-to-Agent) | `to_a2a()` | ✅ | Convert UAP agent into valid A2A descriptor |
-| MCP (Microsoft Copilot) | `to_mcp()` | ✅ | Map UAP agent/tool into MCP-compliant schema |
+| MCP (Model Context Protocol) | `to_mcp()` | ✅ | Map UAP agent/tool into MCP-compliant schema |
 | OpenAPI 3 | `to_openapi()` | ✅ | Export UAP tool(s) as OpenAPI endpoints |
 
 These bridges allow **inter-protocol operability** – for example, developers can register a LangChain tool on OpenWebUI and then expose it in an A2A runtime via UAP translation.
