@@ -5,7 +5,9 @@
 **License**: Apache 2.0  
 **Language**: Python 3.10+  
 **Repository**: _Private/internal (planned public release Q3 2025)_
-[![OpenHub](https://www.openhub.net/p/uap/widgets/project_thin_badge.gif)](https://www.openhub.net/p/unified-agent-protocol)
+
+---
+[![OpenHub](https://www.openhub.net/p/uap/widgets/project_thin_badge.gif)](https://www.openhub.net/p/uap)
 ---
 
 ## ✨ Introduction
