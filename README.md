@@ -1,6 +1,6 @@
 # Unified Agent Protocol (UAP) – Core SDK Specification
 
-**Version**: 0.1 Alpha  
+**Version**: 1.0.0  
 **Maintained by**: [WhoMeta Labs part of WhoMeta Inc.](https://www.whometa.io)  
 **License**: Apache 2.0  
 **Language**: Python 3.10+  
