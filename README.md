@@ -7,7 +7,7 @@
 **Repository**: _Private/internal (planned public release Q3 2025)_
 
 ---
-[![OpenHub](https://www.openhub.net/p/uap/widgets/project_thin_badge.gif)](https://www.openhub.net/p/uap)
+[![OpenHub](https://www.openhub.net/p/uap/widgets/project_thin_badge.gif)](https://www.openhub.net/p/uap) [![PyPI version](https://img.shields.io/pypi/v/unified-agent-protocol)](https://pypi.org/project/unified-agent-protocol/)
 ---
 
 ## ✨ Introduction
