@@ -46,8 +46,14 @@ class OutputSchema(BaseModel):
 
     @validator("schema")
     def must_be_object(cls, v: Dict[str, Any]):  # noqa: N805
-        if v.get("type") != "object":
-            raise ValueError("Output schema root must be of type 'object'")
+        schema_type = v.get("type")
+        # If no explicit type is given, assume 'object' (common when using $ref)
+        if schema_type is None:
+            return v
+        if schema_type not in {"object", "array"}:
+            raise ValueError(
+                "Output schema root must be 'object' or 'array' (got %r)" % schema_type
+            )
         return v
 
 

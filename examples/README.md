@@ -7,11 +7,16 @@ Quick-start inputs for trying out the Unified Agent Protocol SDK.
 | `openwebui/openwebui_tool.json` | Minimal OpenWebUI tool definition to test `parse_openwebui` and CLI conversion. |
 | `langchain/langchain_tool.py` | LangChain `Tool` instance that can be imported and fed to `parse_langchain`. |
 | `openapi/petstore.yaml` | Tiny OpenAPI 3 spec for `parse_openapi`. |
+| `swagger/petstore.json` | Swagger 2.0 spec for `parse_swagger`. |
 | `agent/agent_minimal.json` | Hand-crafted UAP Agent used to demo the export helpers (`to_mcp`, `to_a2a`, `to_openapi`). |
 
 ## CLI demo
 
 ```bash
+# Convert OpenWebUI tool → MCP
+# Convert Swagger → MCP
+uap --input examples/swagger/petstore.json --format mcp | jq . > examples/out/swagger_mcp.json
+
 # Convert OpenWebUI tool → MCP
 uap --input examples/openwebui/openwebui_tool.json --format mcp > examples/out/openwebui_mcp.json
 

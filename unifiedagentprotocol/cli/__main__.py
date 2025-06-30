@@ -23,6 +23,8 @@ from typing import Optional
 import typer
 
 from unifiedagentprotocol.parser.openwebui import parse_openwebui  # type: ignore
+from unifiedagentprotocol.parser.openapi import parse_openapi  # type: ignore
+from unifiedagentprotocol.parser.swagger import parse_swagger  # type: ignore
 from unifiedagentprotocol.export.to_mcp import agent_to_mcp  # type: ignore
 
 app = typer.Typer(add_completion=False, help="Unified Agent Protocol CLI")
@@ -48,8 +50,13 @@ def bind(
         first = data[0]
         data = first.get("tool", first)
 
-    # TODO: add format detection / parser mapping
-    tool_or_agent = parse_openwebui(data)  # placeholder
+    # Basic format detection
+    if isinstance(data, dict) and data.get("swagger", "")[:1] == "2":
+        tool_or_agent = parse_swagger(data)
+    elif isinstance(data, dict) and str(data.get("openapi", "")).startswith("3"):
+        tool_or_agent = parse_openapi(data)[0] if isinstance(parse_openapi(data), list) else parse_openapi(data)
+    else:
+        tool_or_agent = parse_openwebui(data)
 
     if format == "mcp":
         result = agent_to_mcp(tool_or_agent)

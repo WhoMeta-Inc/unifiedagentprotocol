@@ -1,0 +1,39 @@
+{
+  "version": "0.1",
+  "template": {
+    "name": "Hello Tool",
+    "description": "Simple greeting tool that returns a personalised greeting.",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Name of the person to greet",
+        "required": true,
+        "default": null,
+        "enum": null
+      }
+    ],
+    "output": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "greeting": {
+            "type": "string",
+            "description": "Greeting text"
+          }
+        }
+      }
+    },
+    "triggers": [
+      {
+        "type": "manual",
+        "pattern": null,
+        "event_name": null,
+        "description": null,
+        "metadata": {}
+      }
+    ],
+    "ui": null,
+    "metadata": {}
+  }
+}
