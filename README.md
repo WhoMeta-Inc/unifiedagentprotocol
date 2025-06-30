@@ -19,6 +19,107 @@ The `uap-core` SDK is the **reference Python implementation** of this protocol, 
 
 ---
 
+## 🚀 Getting Started
+
+### Installation
+
+Install UAP from PyPI using pip:
+
+```bash
+# Basic installation
+pip install unified-agent-protocol
+
+# With development tools
+pip install unified-agent-protocol[dev]
+
+# With all optional dependencies
+pip install unified-agent-protocol[all]
+```
+
+### Quick Start
+
+#### 1. Define a Simple Tool
+
+```python
+from unifiedagentprotocol.models.tool import Tool, ToolParam
+
+# Create a weather tool
+weather_tool = Tool(
+    name="get_weather",
+    description="Get current weather for a city",
+    parameters=[
+        ToolParam(
+            name="city",
+            type="string",
+            description="Target city name",
+            required=True
+        )
+    ]
+)
+
+print(weather_tool.model_dump_json(indent=2))
+```
+
+#### 2. Create an Agent
+
+```python
+from unifiedagentprotocol.models.agent import Agent
+
+# Create an agent with tools
+weather_agent = Agent(
+    name="WeatherBot",
+    description="Provides weather information",
+    version="1.0.0",
+    tools=[weather_tool]
+)
+
+# Export to different formats
+print("A2A Format:", weather_agent.to_a2a())
+print("MCP Format:", weather_agent.to_mcp())
+print("OpenAPI Spec:", weather_agent.to_openapi())
+```
+
+#### 3. Parse Existing Tools
+
+```python
+from unifiedagentprotocol.parser.openwebui import parse_openwebui_tool
+from unifiedagentprotocol.parser.langchain import parse_langchain_tool
+
+# Parse OpenWebUI tool definition
+openwebui_json = {
+    "name": "calculator",
+    "description": "Basic calculator",
+    # ... more fields
+}
+uap_tool = parse_openwebui_tool(openwebui_json)
+
+# Parse LangChain tool
+from langchain.tools import DuckDuckGoSearchRun
+langchain_tool = DuckDuckGoSearchRun()
+uap_tool = parse_langchain_tool(langchain_tool)
+```
+
+#### 4. CLI Usage
+
+```bash
+# Convert OpenWebUI tools to MCP format
+uap --input openwebui_tools.json --format mcp > mcp_tools.json
+
+# Convert Swagger spec to UAP format
+uap --input petstore.yaml --format uap > uap_tools.json
+
+# Show help
+uap --help
+```
+
+### Requirements
+
+- Python 3.10+
+- Core dependencies: `pydantic`, `typer`, `requests`, `jsonschema`
+- Optional: `aiohttp` (async support), `orjson` (performance), `mkdocs` (docs)
+
+---
+
 ## 💡 Motivation
 
 As the AI agent ecosystem evolves, developers face increasing friction when integrating tools across platforms like OpenWebUI, LangChain, Azure OpenAI Agents, OpenAPI-based agents, or proprietary agent chains.
