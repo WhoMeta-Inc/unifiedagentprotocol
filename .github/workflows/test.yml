@@ -1,0 +1,37 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check .
+      - name: Type-check
+        run: mypy unifiedagentprotocol || true   # advisory until fully typed
+      - name: Test
+        run: pytest -q --cov=unifiedagentprotocol --cov-report=xml
+      - name: Verify generated schemas are in sync
+        run: |
+          python scripts/generate_schemas.py
+          git diff --exit-code -- schemas/

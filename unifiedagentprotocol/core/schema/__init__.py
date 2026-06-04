@@ -1,6 +1,3 @@
 # Copyright 2025-2026 WhoMeta Inc.
 # Licensed under the Apache License, Version 2.0
-"""UAP command-line interface."""
-from .main import app
-
-__all__ = ["app"]
+"""UAP 1.0 schema models (Pydantic v2)."""

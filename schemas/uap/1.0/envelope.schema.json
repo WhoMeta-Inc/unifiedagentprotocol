@@ -1,0 +1,1361 @@
+{
+  "$defs": {
+    "Agent": {
+      "additionalProperties": true,
+      "description": "An autonomous actor exposing one or more skills and tools.",
+      "properties": {
+        "auth": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AuthConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capabilities": {
+          "$ref": "#/$defs/Capabilities"
+        },
+        "compliance": {
+          "$ref": "#/$defs/Compliance"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Name"
+        },
+        "documentation_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Documentation Url"
+        },
+        "endpoints": {
+          "items": {
+            "$ref": "#/$defs/Endpoint"
+          },
+          "title": "Endpoints",
+          "type": "array"
+        },
+        "homepage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Homepage"
+        },
+        "id": {
+          "description": "URN: urn:uap:agent:<slug>",
+          "title": "Id",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publisher"
+        },
+        "skills": {
+          "items": {
+            "$ref": "#/$defs/Skill"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "tools": {
+          "description": "Inline Tool definitions OR Tool URNs to resolve later.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Tool"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Tools",
+          "type": "array"
+        },
+        "ui": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UIConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "version": {
+          "default": "0.1.0",
+          "description": "Semver of the agent definition.",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "Agent",
+      "type": "object"
+    },
+    "AuthConfig": {
+      "additionalProperties": true,
+      "description": "Authentication contract for invoking a Tool or Agent.\n\nThe ``secret_ref`` field MUST be a URI to an external secret store\n(vault://, aws-sm://, gcp-sm://, env://NAME). Inline secrets are\nrejected to keep UAP payloads safe to ship.",
+      "properties": {
+        "audience": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Audience"
+        },
+        "authorize_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Authorize Url"
+        },
+        "header_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Header name for \"api_key\" or \"bearer\" (default: Authorization).",
+          "title": "Header Name"
+        },
+        "scopes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Scopes",
+          "type": "array"
+        },
+        "secret_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reference to the secret material. Schemes: vault://, aws-sm://, gcp-sm://, env://NAME",
+          "title": "Secret Ref"
+        },
+        "token_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Token Url"
+        },
+        "type": {
+          "$ref": "#/$defs/AuthType",
+          "default": "none"
+        }
+      },
+      "title": "AuthConfig",
+      "type": "object"
+    },
+    "AuthType": {
+      "enum": [
+        "none",
+        "api_key",
+        "bearer",
+        "oauth2",
+        "mtls",
+        "aws_sigv4",
+        "gcp_service_account"
+      ],
+      "title": "AuthType",
+      "type": "string"
+    },
+    "Capabilities": {
+      "additionalProperties": true,
+      "description": "Behavioural properties used by orchestrators, policy engines, and UIs.\n\nDefaults reflect the safest assumption: not idempotent, writes state,\nrequires human approval. Tool authors MUST relax these explicitly.",
+      "properties": {
+        "deterministic": {
+          "default": false,
+          "title": "Deterministic",
+          "type": "boolean"
+        },
+        "idempotent": {
+          "default": false,
+          "title": "Idempotent",
+          "type": "boolean"
+        },
+        "long_running": {
+          "default": false,
+          "title": "Long Running",
+          "type": "boolean"
+        },
+        "max_concurrency": {
+          "default": 1,
+          "title": "Max Concurrency",
+          "type": "integer"
+        },
+        "requires_human_approval": {
+          "default": true,
+          "title": "Requires Human Approval",
+          "type": "boolean"
+        },
+        "side_effects": {
+          "$ref": "#/$defs/SideEffects",
+          "default": "writes"
+        },
+        "supports_cancellation": {
+          "default": false,
+          "title": "Supports Cancellation",
+          "type": "boolean"
+        },
+        "supports_streaming": {
+          "default": false,
+          "title": "Supports Streaming",
+          "type": "boolean"
+        }
+      },
+      "title": "Capabilities",
+      "type": "object"
+    },
+    "Compliance": {
+      "additionalProperties": true,
+      "description": "Procurement-time compliance properties.\n\nThese fields are intentionally coarse: they are *labels* the policy\nengine consumes, not formal proofs. Auditors use them to scope tools\nin or out of a process.",
+      "properties": {
+        "audit_log": {
+          "default": true,
+          "title": "Audit Log",
+          "type": "boolean"
+        },
+        "data_classification": {
+          "$ref": "#/$defs/DataClassification",
+          "default": "internal"
+        },
+        "data_residency": {
+          "description": "Region codes such as \"EU\", \"US\", \"DE\", \"CH\".",
+          "items": {
+            "type": "string"
+          },
+          "title": "Data Residency",
+          "type": "array"
+        },
+        "pii": {
+          "$ref": "#/$defs/PIILevel",
+          "default": "none"
+        },
+        "regulations": {
+          "description": "ISO short codes, e.g. [\"GDPR\", \"HIPAA\", \"SOC2\", \"PCI-DSS\"]",
+          "items": {
+            "type": "string"
+          },
+          "title": "Regulations",
+          "type": "array"
+        },
+        "retention_days": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Maximum retention of caller payloads, in days. None = unspecified, 0 = no retention.",
+          "title": "Retention Days"
+        }
+      },
+      "title": "Compliance",
+      "type": "object"
+    },
+    "CostHint": {
+      "additionalProperties": true,
+      "description": "Best-effort cost & latency estimates per invocation.\n\nThese are *hints*. Concrete billing is the runtime's responsibility.\nUse them for routing, batching and budgeting decisions.",
+      "properties": {
+        "currency": {
+          "default": "USD",
+          "maxLength": 3,
+          "minLength": 3,
+          "title": "Currency",
+          "type": "string"
+        },
+        "latency_ms_p50": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latency Ms P50"
+        },
+        "latency_ms_p99": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latency Ms P99"
+        },
+        "per_call_usd": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Per Call Usd"
+        },
+        "tokens_in_estimate": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tokens In Estimate"
+        },
+        "tokens_out_estimate": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tokens Out Estimate"
+        }
+      },
+      "title": "CostHint",
+      "type": "object"
+    },
+    "DataClassification": {
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted"
+      ],
+      "title": "DataClassification",
+      "type": "string"
+    },
+    "Endpoint": {
+      "additionalProperties": true,
+      "description": "A network-addressable interface for invoking a Tool or Agent.",
+      "properties": {
+        "method": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "HTTP method. Required when transport=http.",
+          "title": "Method"
+        },
+        "streaming": {
+          "default": false,
+          "title": "Streaming",
+          "type": "boolean"
+        },
+        "supports_async": {
+          "default": false,
+          "description": "Whether the endpoint supports task-id polling / callbacks.",
+          "title": "Supports Async",
+          "type": "boolean"
+        },
+        "timeout_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeout Seconds"
+        },
+        "transport": {
+          "$ref": "#/$defs/Transport",
+          "default": "http"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Full URL or stdio command. Empty for in-process tools.",
+          "title": "Url"
+        }
+      },
+      "title": "Endpoint",
+      "type": "object"
+    },
+    "Kind": {
+      "enum": [
+        "agent",
+        "tool",
+        "manifest"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "Manifest": {
+      "additionalProperties": true,
+      "description": "A registry-publishable bundle.\n\nBundles MAY embed full Agent/Tool definitions or reference them by URN.\nRegistries are expected to resolve URN references at fetch time.",
+      "properties": {
+        "agents": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Agent"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Agents",
+          "type": "array"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "homepage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Homepage"
+        },
+        "id": {
+          "description": "URN: urn:uap:manifest:<slug>",
+          "title": "Id",
+          "type": "string"
+        },
+        "license": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "License"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Publisher"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "tools": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Tool"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Tools",
+          "type": "array"
+        },
+        "version": {
+          "default": "0.1.0",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "Manifest",
+      "type": "object"
+    },
+    "OutputSchema": {
+      "additionalProperties": true,
+      "description": "JSON-Schema description of the tool's response payload.",
+      "properties": {
+        "schema": {
+          "$ref": "#/$defs/ParameterSchema"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "title": "OutputSchema",
+      "type": "object"
+    },
+    "PIILevel": {
+      "enum": [
+        "none",
+        "low",
+        "high"
+      ],
+      "title": "PIILevel",
+      "type": "string"
+    },
+    "Parameter": {
+      "additionalProperties": true,
+      "description": "One named input or output value of a Tool.",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "location": {
+          "$ref": "#/$defs/ParameterLocation",
+          "default": "body"
+        },
+        "name": {
+          "description": "Identifier used in invocations.",
+          "title": "Name",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "schema": {
+          "$ref": "#/$defs/ParameterSchema"
+        }
+      },
+      "required": [
+        "name",
+        "schema"
+      ],
+      "title": "Parameter",
+      "type": "object"
+    },
+    "ParameterLocation": {
+      "description": "Where the parameter is carried at the protocol level.",
+      "enum": [
+        "body",
+        "query",
+        "path",
+        "header",
+        "context"
+      ],
+      "title": "ParameterLocation",
+      "type": "string"
+    },
+    "ParameterSchema": {
+      "additionalProperties": true,
+      "description": "A constrained subset of JSON Schema Draft 2020-12.\n\nCustom UAP fields use the ``x-uap-*`` namespace and are preserved through\nround-trips.",
+      "properties": {
+        "$ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "$Ref"
+        },
+        "allOf": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ParameterSchema"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Allof"
+        },
+        "anyOf": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ParameterSchema"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Anyof"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Default"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "enum": {
+          "anyOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Enum"
+        },
+        "format": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "JSON-Schema format hint (e.g. \"email\", \"uri\", \"date-time\").",
+          "title": "Format"
+        },
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterSchema"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "maxLength": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maxlength"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum"
+        },
+        "minLength": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minlength"
+        },
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum"
+        },
+        "oneOf": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ParameterSchema"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Oneof"
+        },
+        "pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pattern"
+        },
+        "properties": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/ParameterSchema"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Properties"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        }
+      },
+      "title": "ParameterSchema",
+      "type": "object"
+    },
+    "SideEffects": {
+      "enum": [
+        "none",
+        "read_only",
+        "writes",
+        "destructive"
+      ],
+      "title": "SideEffects",
+      "type": "string"
+    },
+    "Skill": {
+      "additionalProperties": true,
+      "description": "A named capability of an Agent, possibly composed from several tools.\n\nA skill is the unit that A2A surfaces to other agents. Compare with\nA2A AgentCard.skills.",
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Natural-language example invocations.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Examples",
+          "type": "array"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "input_modes": {
+          "description": "Modalities accepted, e.g. [\"text\", \"image\", \"audio\"].",
+          "items": {
+            "type": "string"
+          },
+          "title": "Input Modes",
+          "type": "array"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "output_modes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Output Modes",
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "Skill",
+      "type": "object"
+    },
+    "Tool": {
+      "additionalProperties": true,
+      "description": "A single executable capability with full enterprise metadata.",
+      "properties": {
+        "auth": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AuthConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "capabilities": {
+          "$ref": "#/$defs/Capabilities"
+        },
+        "compliance": {
+          "$ref": "#/$defs/Compliance"
+        },
+        "cost": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CostHint"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Name"
+        },
+        "endpoint": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Endpoint"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "id": {
+          "description": "URN: urn:uap:tool:<slug>",
+          "title": "Id",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "name": {
+          "description": "Machine identifier used in invocations.",
+          "title": "Name",
+          "type": "string"
+        },
+        "output": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutputSchema"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "parameters": {
+          "items": {
+            "$ref": "#/$defs/Parameter"
+          },
+          "title": "Parameters",
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "triggers": {
+          "items": {
+            "$ref": "#/$defs/Trigger"
+          },
+          "title": "Triggers",
+          "type": "array"
+        },
+        "ui": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UIConfig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "version": {
+          "default": "0.1.0",
+          "description": "Semver of the tool definition.",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "title": "Tool",
+      "type": "object"
+    },
+    "Transport": {
+      "enum": [
+        "http",
+        "sse",
+        "websocket",
+        "stdio",
+        "grpc",
+        "nats"
+      ],
+      "title": "Transport",
+      "type": "string"
+    },
+    "Trigger": {
+      "additionalProperties": true,
+      "description": "Activation contract for a Tool or Agent.",
+      "properties": {
+        "cron": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Five-field cron, UTC.",
+          "title": "Cron"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "event_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Name"
+        },
+        "intent_pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Regex or glob matched against natural-language input.",
+          "title": "Intent Pattern"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "type": {
+          "$ref": "#/$defs/TriggerType",
+          "default": "manual"
+        },
+        "webhook_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Path mounted by the runtime (e.g. \"/hooks/weather\").",
+          "title": "Webhook Path"
+        }
+      },
+      "title": "Trigger",
+      "type": "object"
+    },
+    "TriggerType": {
+      "enum": [
+        "manual",
+        "cron",
+        "webhook",
+        "intent",
+        "event"
+      ],
+      "title": "TriggerType",
+      "type": "string"
+    },
+    "UIConfig": {
+      "additionalProperties": true,
+      "description": "Optional UI rendering hints. Front-ends MAY ignore unknown fields.",
+      "properties": {
+        "color": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "CSS color (hex or name).",
+          "title": "Color"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Logical group for sidebars.",
+          "title": "Group"
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Icon identifier (\"mdi:foo\") or URL.",
+          "title": "Icon"
+        },
+        "label": {
+          "description": "Human-readable label.",
+          "title": "Label",
+          "type": "string"
+        },
+        "locale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "BCP-47 tag for label/description.",
+          "title": "Locale"
+        },
+        "order": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Sort weight (lower first).",
+          "title": "Order"
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "title": "UIConfig",
+      "type": "object"
+    }
+  },
+  "$id": "https://schemas.whometa.io/uap/1.0/envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "The outermost wire object. Carries version and dispatch metadata.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/Kind"
+    },
+    "payload": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Agent"
+        },
+        {
+          "$ref": "#/$defs/Tool"
+        },
+        {
+          "$ref": "#/$defs/Manifest"
+        }
+      ],
+      "title": "Payload"
+    },
+    "produced_by": {
+      "default": "uap-core/1.0.0",
+      "description": "User-Agent-like identifier of the producer.",
+      "title": "Produced By",
+      "type": "string"
+    },
+    "signature": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional Ed25519 signature over the canonical payload JSON.",
+      "title": "Signature"
+    },
+    "uap_version": {
+      "default": "1.0",
+      "title": "Uap Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "id",
+    "payload"
+  ],
+  "title": "Envelope",
+  "type": "object"
+}

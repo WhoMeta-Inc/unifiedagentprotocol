@@ -1,316 +1,153 @@
-# Copyright 2025 WhoMeta Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+# Copyright 2025-2026 WhoMeta Inc.
+# Licensed under the Apache License, Version 2.0
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "unified-agent-protocol"
-version = "1.0.1"
-description = "Unified Agent Protocol Core SDK - Universal interoperability layer for AI agents and tools"
+version = "1.0.0"
+description = "Unified Agent Protocol — Universal interoperability layer for AI agents and tools"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-authors = [
-    {name = "WhoMeta Inc.", email = "opensource@whometa.com"}
-]
-maintainers = [
-    {name = "WhoMeta Labs", email = "labs@whometa.com"}
-]
+authors = [{name = "WhoMeta Inc.", email = "opensource@whometa.io"}]
+maintainers = [{name = "WhoMeta Labs", email = "labs@whometa.io"}]
 keywords = [
-    "ai-agents",
-    "protocol",
-    "interoperability", 
-    "agent-tools",
-    "mcp",
-    "a2a",
-    "openapi",
-    "langchain",
-    "openwebui",
-    "agent-orchestration",
-    "tool-integration",
-    "sdk"
+    "ai-agents", "protocol", "interoperability", "agent-tools",
+    "mcp", "a2a", "openai", "anthropic", "gemini", "openapi",
+    "langchain", "openwebui", "agent-orchestration", "tool-integration",
 ]
 classifiers = [
-    # Development Status
-    "Development Status :: 3 - Alpha",
-    
-    # Intended Audience
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
     "Intended Audience :: Information Technology",
-    
-    # Topic
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-    "Topic :: System :: Distributed Computing",
-    
-    # License
     "License :: OSI Approved :: Apache Software License",
-    
-    # Programming Language
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3 :: Only",
-    
-    # Operating System
     "Operating System :: OS Independent",
-    
-    # Environment
-    "Environment :: Console",
-    "Environment :: Web Environment",
-    
-    # Framework
-    "Framework :: Pydantic",
-    "Framework :: AsyncIO",
-    
-    # Natural Language
-    "Natural Language :: English",
-    
-    # Typing
-    "Typing :: Typed"
+    "Typing :: Typed",
+    "Framework :: Pydantic :: 2",
 ]
 
+# Core stays minimal — bridges are stdlib-only.
 dependencies = [
-    "pydantic>=2.0,<3.0",
-    "typer>=0.9.0,<1.0",
-    "requests>=2.28.0,<3.0",
-    "jsonschema>=4.17.0,<5.0",
-    "pyyaml>=6.0,<7.0",
-    "rich>=13.0.0,<14.0"
+    "pydantic>=2.5,<3.0",
+    "typer>=0.9,<1.0",
 ]
 
 [project.optional-dependencies]
-# Development dependencies
+# Optional runtime (FastAPI adapter, registry server)
+runtime = [
+    "fastapi>=0.110,<1.0",
+    "uvicorn>=0.27,<1.0",
+]
+
+# Optional registry backends
+registry = [
+    "redis>=5.0,<6.0",
+]
+
+# JSON Schema validation in tests
+validate = [
+    "jsonschema>=4.21,<5.0",
+]
+
+# YAML input on CLI
+yaml = [
+    "pyyaml>=6.0,<7.0",
+]
+
+# Developer tooling
 dev = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "pytest-asyncio>=0.21.0",
-    "black>=23.7.0",
-    "isort>=5.12.0",
-    "flake8>=6.0.0",
-    "mypy>=1.5.0",
-    "pre-commit>=3.3.0",
-    "tox>=4.6.0"
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "pytest-asyncio>=0.21",
+    "ruff>=0.4",
+    "mypy>=1.8",
+    "fastapi>=0.110",
+    "httpx>=0.27",
+    "jsonschema>=4.21",
+    "pyyaml>=6.0",
 ]
 
-# Documentation dependencies
+# Documentation
 docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.1.0",
-    "mkdocstrings[python]>=0.22.0",
-    "mkdocs-autorefs>=0.4.0"
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
 ]
 
-# Async support
-async = [
-    "aiohttp>=3.8.0,<4.0",
-    "asyncio-throttle>=1.0.0,<2.0"
-]
-
-# Extended format support
-formats = [
-    "toml>=0.10.0",
-    "xmltodict>=0.13.0",
-    "protobuf>=4.0.0,<5.0"
-]
-
-# Performance optimizations
-performance = [
-    "orjson>=3.9.0,<4.0",
-    "msgpack>=1.0.0,<2.0"
-]
-
-# All optional dependencies
 all = [
-    "unified-agent-protocol[dev,docs,async,formats,performance]"
+    "unified-agent-protocol[runtime,registry,validate,yaml]",
 ]
 
 [project.urls]
 Homepage = "https://www.whometa.io"
-#Documentation = "https://docs.whometa.io/uap"
 Repository = "https://github.com/WhoMeta-Inc/unifiedagentprotocol"
 "Bug Tracker" = "https://github.com/WhoMeta-Inc/unifiedagentprotocol/issues"
 Changelog = "https://github.com/WhoMeta-Inc/unifiedagentprotocol/blob/main/CHANGELOG.md"
-"Source Code" = "https://github.com/WhoMeta-Inc/unifiedagentprotocol"
-"Release Notes" = "https://github.com/WhoMeta-Inc/unifiedagentprotocol/releases"
 
 [project.scripts]
-uap = "unifiedagentprotocol.cli.__main__:app"
+uap = "unifiedagentprotocol.cli.main:app"
 
-[project.entry-points."uap.parsers"]
-openwebui = "unifiedagentprotocol.parser.openwebui:parse_openwebui_tool"
-langchain = "unifiedagentprotocol.parser.langchain:parse_langchain_tool"
-openapi = "unifiedagentprotocol.parser.openapi:parse_openapi_spec"
-swagger = "unifiedagentprotocol.parser.swagger:parse_swagger_spec"
+[project.entry-points."uap.bridges"]
+mcp = "unifiedagentprotocol.bridges.mcp"
+a2a = "unifiedagentprotocol.bridges.a2a"
+openai = "unifiedagentprotocol.bridges.openai"
+anthropic = "unifiedagentprotocol.bridges.anthropic"
+gemini = "unifiedagentprotocol.bridges.gemini"
+openapi = "unifiedagentprotocol.bridges.openapi"
+swagger = "unifiedagentprotocol.bridges.swagger"
+openwebui = "unifiedagentprotocol.bridges.openwebui"
+langchain = "unifiedagentprotocol.bridges.langchain"
 
-[project.entry-points."uap.exporters"]
-a2a = "unifiedagentprotocol.export.to_a2a:agent_to_a2a"
-mcp = "unifiedagentprotocol.export.to_mcp:agent_to_mcp"
-openapi = "unifiedagentprotocol.export.to_openapi:agent_to_openapi"
-
-# Tool configurations
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["unifiedagentprotocol*"]
-exclude = ["tests*", "examples*"]
+exclude = ["tests*", "examples*", "scripts*"]
 
 [tool.setuptools.package-data]
-"unifiedagentprotocol" = ["py.typed", "*.pyi"]
+"unifiedagentprotocol" = ["py.typed"]
 
-# Black configuration
-[tool.black]
-line-length = 88
-target-version = ['py310', 'py311', 'py312']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # Directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers"]
+markers = [
+    "slow: marks tests as slow",
+    "integration: integration tests",
+]
 
-# isort configuration
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["unifiedagentprotocol"]
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+[tool.ruff]
+target-version = "py310"
+line-length = 100
 
-# MyPy configuration
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "C4"]
+ignore = ["E501", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**/*" = ["B011"]
+
 [tool.mypy]
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
 no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
 strict_equality = true
-show_error_codes = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
 
-# Pytest configuration
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--cov=unifiedagentprotocol",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml"
-]
-testpaths = ["tests"]
-filterwarnings = [
-    "error",
-    "ignore::UserWarning",
-    "ignore::DeprecationWarning"
-]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests"
-]
-
-# Coverage configuration
 [tool.coverage.run]
 source = ["unifiedagentprotocol"]
-omit = [
-    "*/tests/*",
-    "*/test_*.py",
-    "*/__pycache__/*"
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod"
-]
-
-# Flake8 configuration
-[tool.flake8]
-max-line-length = 88
-extend-ignore = ["E203", "W503", "E501"]
-max-complexity = 10
-select = ["E", "W", "F", "C"]
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    ".eggs",
-    "*.egg-info",
-    ".tox",
-    ".venv"
-]
-
-# Bandit security linter configuration
-[tool.bandit]
-exclude_dirs = ["tests", "examples"]
-skips = ["B101", "B601"]
-
-# Ruff configuration (alternative to flake8)
-[tool.ruff]
-target-version = "py310"
-line-length = 88
-select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4", # flake8-comprehensions
-    "UP", # pyupgrade
-]
-ignore = [
-    "E501",  # line too long, handled by black
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
-]
-
-[tool.ruff.per-file-ignores]
-"__init__.py" = ["F401"]
-"tests/**/*" = ["B011"]
+omit = ["*/tests/*", "*/__pycache__/*", "scripts/*"]

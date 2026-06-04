@@ -1,221 +1,156 @@
-# Unified Agent Protocol (UAP) – Core SDK Specification
+# Unified Agent Protocol (UAP) — Core SDK
 
-**Version**: 1.0.0  
-**Maintained by**: [WhoMeta Labs part of WhoMeta Inc.](https://www.whometa.io)  
-**License**: Apache 2.0  
-**Language**: Python 3.10+  
-**Repository**: _Private/internal (planned public release Q3 2025)_
+**Version 1.0** · Apache-2.0 · Python 3.10+
 
----
-[![OpenHub](https://www.openhub.net/p/uap/widgets/project_thin_badge.gif)](https://www.openhub.net/p/uap) [![PyPI version](https://img.shields.io/pypi/v/unified-agent-protocol)](https://pypi.org/project/unified-agent-protocol/)
----
+UAP is the **universal interoperability layer** for AI agents and tools.
 
-## ✨ Introduction
+Define an agent **once** in UAP — then ship it to **MCP**, **A2A**,
+**OpenAI Assistants**, **Anthropic Tool Use**, **Google Gemini
+Functions**, **OpenAPI 3**, **OpenWebUI**, **LangChain** — without
+rewriting a single field. Every adapter is **bidirectional** and
+declares its **LossInfo** explicitly. No silent data loss.
 
-The **Unified Agent Protocol (UAP)** is a foundational interoperability layer designed to **standardize the definition, registration, execution, and orchestration of AI agents and tools** across diverse ecosystems.  
-UAP is **not** a runtime or a competing protocol like A2A or MCP – instead, it acts as a **universal adapter**, enabling seamless translation between heterogeneous agent formats, toolkits, and interface protocols.
+## What UAP gives you over MCP / A2A alone
 
-The `uap-core` SDK is the **reference Python implementation** of this protocol, designed for SDK-level integration, automatic conversions, and full schema introspection.
+| Concern | MCP | A2A | UAP |
+|---------|:---:|:---:|:---:|
+| Tool description schema | ✅ | — | ✅ |
+| Agent-to-Agent runtime | — | ✅ | ✅ (via bridges) |
+| Cross-vendor bridges | — | — | ✅ (9 formats) |
+| Bidirectional round-trip | — | — | ✅ |
+| Auth modelling (OAuth2/mTLS/SigV4/…) | partial | partial | ✅ |
+| RBAC / Capabilities | — | — | ✅ |
+| Compliance (GDPR/HIPAA/residency) | — | — | ✅ |
+| Cost / latency hints | — | — | ✅ |
+| URN identity | — | — | ✅ |
+| Versioned wire format | ✅ | ✅ | ✅ |
 
----
-
-## 🚀 Getting Started
-
-### Installation
-
-Install UAP from PyPI using pip:
+## Install
 
 ```bash
-# Basic installation
-pip install unified-agent-protocol
-
-# With development tools
-pip install unified-agent-protocol[dev]
-
-# With all optional dependencies
-pip install unified-agent-protocol[all]
+pip install unified-agent-protocol            # core SDK only
+pip install unified-agent-protocol[runtime]   # + FastAPI runtime
+pip install unified-agent-protocol[all]       # + every optional dep
 ```
 
-### Quick Start
-
-#### 1. Define a Simple Tool
+## Quick start
 
 ```python
-from unifiedagentprotocol.models.tool import Tool, ToolParam
+from unifiedagentprotocol import (
+    Tool, Agent, Skill, Parameter, ParameterSchema,
+    Capabilities, SideEffects, Compliance, DataClassification,
+    AuthConfig, AuthType, Endpoint, Transport, Envelope,
+)
 
-# Create a weather tool
-weather_tool = Tool(
+weather = Tool(
+    id="urn:uap:tool:get-weather",
     name="get_weather",
-    description="Get current weather for a city",
-    parameters=[
-        ToolParam(
-            name="city",
-            type="string",
-            description="Target city name",
-            required=True
-        )
-    ]
+    description="Return current weather for a city.",
+    parameters=[Parameter(name="city", schema=ParameterSchema(type="string"))],
+    endpoint=Endpoint(transport=Transport.HTTP,
+                      url="https://api.example.com/weather", method="POST"),
+    auth=AuthConfig(type=AuthType.API_KEY,
+                    secret_ref="vault://kv/data/weather#token"),
+    capabilities=Capabilities(idempotent=True,
+                              side_effects=SideEffects.READ_ONLY,
+                              deterministic=False,
+                              requires_human_approval=False),
+    compliance=Compliance(data_classification=DataClassification.PUBLIC,
+                          regulations=["GDPR"], data_residency=["EU"]),
 )
 
-print(weather_tool.model_dump_json(indent=2))
-```
-
-#### 2. Create an Agent
-
-```python
-from unifiedagentprotocol.models.agent import Agent
-
-# Create an agent with tools
-weather_agent = Agent(
+agent = Agent(
+    id="urn:uap:agent:weather-bot",
     name="WeatherBot",
-    description="Provides weather information",
-    version="1.0.0",
-    tools=[weather_tool]
+    description="Provides weather information.",
+    tools=[weather],
+    skills=[Skill(id="answer-weather", name="answer-weather",
+                  description="Answer weather questions.")],
+    endpoints=[Endpoint(transport=Transport.HTTP, url="https://bot.example.com")],
 )
 
-# Export to different formats
-print("A2A Format:", weather_agent.to_a2a())
-print("MCP Format:", weather_agent.to_mcp())
-print("OpenAPI Spec:", weather_agent.to_openapi())
+print(Envelope.of(agent).to_wire())
 ```
 
-#### 3. Parse Existing Tools
+Ship it to every ecosystem:
 
 ```python
-from unifiedagentprotocol.parser.openwebui import parse_openwebui_tool
-from unifiedagentprotocol.parser.langchain import parse_langchain_tool
+from unifiedagentprotocol.bridges.mcp        import to_mcp
+from unifiedagentprotocol.bridges.a2a        import to_a2a
+from unifiedagentprotocol.bridges.openai     import to_openai
+from unifiedagentprotocol.bridges.anthropic  import to_anthropic
+from unifiedagentprotocol.bridges.gemini     import to_gemini
+from unifiedagentprotocol.bridges.openapi    import to_openapi
 
-# Parse OpenWebUI tool definition
-openwebui_json = {
-    "name": "calculator",
-    "description": "Basic calculator",
-    # ... more fields
-}
-uap_tool = parse_openwebui_tool(openwebui_json)
-
-# Parse LangChain tool
-from langchain.tools import DuckDuckGoSearchRun
-langchain_tool = DuckDuckGoSearchRun()
-uap_tool = parse_langchain_tool(langchain_tool)
+mcp_payload,    _ = to_mcp(agent)
+a2a_card,       _ = to_a2a(agent)
+oai_assistant,  _ = to_openai(agent)
+claude_tool,    _ = to_anthropic(weather)
+gemini_decl,    _ = to_gemini(weather)
+openapi_spec,   _ = to_openapi(agent)
 ```
 
-#### 4. CLI Usage
+Every bridge also has an inverse `from_<format>(…)` returning
+`(uap_object, LossInfo)`.
+
+## CLI
 
 ```bash
-# Convert OpenWebUI tools to MCP format
-uap --input openwebui_tools.json --format mcp > mcp_tools.json
-
-# Convert Swagger spec to UAP format
-uap --input petstore.yaml --format uap > uap_tools.json
-
-# Show help
-uap --help
+uap version
+uap schema-export --output-dir schemas/uap/1.0
+uap bind  --input my_tool.json --format mcp --show-loss
+uap validate --input my_agent.json
+uap lint --input my_agent.json
+uap serve --registry-path ./registry --port 8000
 ```
 
-### Requirements
+The auto-detect `bind` accepts MCP, A2A, OpenAI, Anthropic, OpenWebUI,
+LangChain, OpenAPI 3, Swagger 2 and bare UAP envelopes.
 
-- Python 3.10+
-- Core dependencies: `pydantic`, `typer`, `requests`, `jsonschema`
-- Optional: `aiohttp` (async support), `orjson` (performance), `mkdocs` (docs)
+## Architecture
 
----
+```
+┌──────────────────────────────────────────────────────────────┐
+│  Runtime  (optional)   FastAPI adapter, /.well-known/agent   │
+├──────────────────────────────────────────────────────────────┤
+│  Registry (optional)   In-memory / Filesystem / pluggable    │
+├──────────────────────────────────────────────────────────────┤
+│  Bridges               MCP, A2A, OpenAI, Anthropic, Gemini,  │
+│  (bidirectional)       OpenAPI, Swagger, OpenWebUI, LangChain│
+├──────────────────────────────────────────────────────────────┤
+│  Core IR (Schema)      Tool, Agent, Parameter (JSON-Schema), │
+│                        Auth, Capabilities, Compliance, Cost, │
+│                        Endpoint, Trigger, Envelope, LossInfo │
+├──────────────────────────────────────────────────────────────┤
+│  Wire Spec             schemas/uap/1.0/*.schema.json         │
+└──────────────────────────────────────────────────────────────┘
+```
 
-## 💡 Motivation
+Layer rules:
 
-As the AI agent ecosystem evolves, developers face increasing friction when integrating tools across platforms like OpenWebUI, LangChain, Azure OpenAI Agents, OpenAPI-based agents, or proprietary agent chains.
+- `core/` depends on nothing but Pydantic + stdlib.
+- `bridges/<x>/` depends only on `core/`.
+- `runtime/` depends on `core/`, `bridges/`, `registry_impl/`.
+- `cli/` is the only module allowed to import anywhere.
 
-Common challenges include:
+See [`docs/adr/0001-architecture-overview.md`](docs/adr/0001-architecture-overview.md)
+and [`docs/spec/uap-1.0-wire-format.md`](docs/spec/uap-1.0-wire-format.md).
 
-- ❌ Fragmented agent and tool definition formats
-- ❌ Missing bridges between proprietary agent runtimes
-- ❌ Lack of universal abstraction for tool metadata, input types, and execution capabilities
-- ❌ Friction when reusing agent definitions across platforms (e.g., MCP ↔ A2A ↔ OpenAPI)
+## Examples
 
-**UAP solves this** by introducing a **common schema + protocol** that allows agents and tools to be described once – and deployed, registered, or bridged anywhere.
+- [`examples/01_define_tool_and_agent.py`](examples/01_define_tool_and_agent.py) — full enterprise-marked agent.
+- [`examples/02_bridge_to_many_formats.py`](examples/02_bridge_to_many_formats.py) — same agent → six target formats.
 
----
-
-## 📦 Key Features (Milestone 1)
-
-- 🧠 **Unified JSON model**: All agent, tool, trigger, and role definitions follow a strongly typed Pydantic schema.
-- 🔌 **Multi-source parsers**:
-  - `parse_openwebui(json)`: Import tools from OpenWebUI format.
-  - `parse_langchain(tool)`: Extract tool metadata from LangChain definitions.
-  - `parse_openapi(spec)`: Map OpenAPI endpoints to UAP tools.
-- 📤 **Export bridges**:
-  - `to_a2a(agent)`: Generate A2A-compatible payload.
-  - `to_mcp(agent)`: Convert to Model Context Protocol (MCP) schema.
-  - `to_openapi(tool)`: Derive standard OpenAPI spec from UAP tool.
-- 🖥️ **CLI (`uap bind`)**:
-  - Run transformations via command-line: `uap bind --input tools.json --format mcp`
-- 🛠️ **Development-first SDK**:
-  - Works offline, no server required.
-  - Fully typed Python models (intellisense, validation).
-  - Optional integration with LangChain, FastAPI, and asyncio runtimes.
-
----
-
-## 🧩 Core Concepts
-
-| Concept        | Description                                                                 |
-|----------------|-----------------------------------------------------------------------------|
-| `Tool`         | Describes an executable unit with input/output schemas and runtime hints.  |
-| `Agent`        | A logical actor using one or more tools to fulfill a task or objective.    |
-| `Trigger`      | Defines when and how agents/tools should activate (event, cron, intent).   |
-| `Role`         | Describes access & behavioral context (e.g., "analyst", "investigator").   |
-| `OutputSchema` | Optional structure for results / downstream usage.                         |
-| `UIConfig`     | Describes how this entity is represented in GUIs (forms, widgets, prompts).|
-
-All objects are implemented as subclasses of `pydantic.BaseModel` and support:
-
-- ✅ Full JSON validation
-- ✅ `.dict()` / `.json()` / `.from_json()` compatibility
-- ✅ Versioning fields
-- ✅ Extension-safe typing (e.g., `extra = "allow"`)
-
----
-
-## 🔄 Ecosystem Bridges
-
-| Target Protocol | Bridge | Status | Description |
-|-----------------|--------|--------|-------------|
-| A2A (Agent-to-Agent) | `to_a2a()` | ✅ | Convert UAP agent into valid A2A descriptor |
-| MCP (Model Context Protocol) | `to_mcp()` | ✅ | Map UAP agent/tool into MCP-compliant schema |
-| OpenAPI 3 | `to_openapi()` | ✅ | Export UAP tool(s) as OpenAPI endpoints |
-
-These bridges allow **inter-protocol operability** – for example, developers can register a LangChain tool on OpenWebUI and then expose it in an A2A runtime via UAP translation.
-
----
-
-## 📚 Example Use Case
+## Testing
 
 ```bash
-# Convert OpenWebUI tools into MCP-ready format
-uap bind --input tools_openwebui.json --format mcp > mcp_payload.json
-```  
+pytest -q
+```
 
----
+Bridge round-trip tests live under `tests/bridges/` and assert
+`from_x(to_x(obj)) == obj` on the representable subset, with
+`LossInfo` covering the rest.
 
-## 🤝 Contributing
+## License
 
-Contributions, issues and feature requests are **very welcome**!
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feat/awesome-feature`)
-3. Commit your changes (`git commit -m 'feat: add awesome feature'`)
-4. Push to the branch (`git push origin feat/awesome-feature`)
-5. Open a pull request
-
-For full guidelines, please read the [CONTRIBUTE guide](contribute.md).
-
----
-
-## ⚖️ License
-
-This project is licensed under the **Apache License 2.0** – see the [LICENSE](LICENSE) file for details.
-
----
-
-## 📑 Changelog
-
-All notable changes will be documented in [CHANGELOG.md](CHANGELOG.md).
+Apache 2.0 — see [LICENSE](LICENSE).
