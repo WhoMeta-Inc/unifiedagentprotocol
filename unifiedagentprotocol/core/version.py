@@ -11,7 +11,7 @@ component. Minor bumps MUST be backwards compatible.
 from __future__ import annotations
 
 UAP_VERSION: str = "1.0"
-SDK_VERSION: str = "1.0.0"
+SDK_VERSION: str = "1.1.0"
 
 
 def is_compatible(payload_version: str) -> bool:

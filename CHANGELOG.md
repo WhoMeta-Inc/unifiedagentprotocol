@@ -3,6 +3,11 @@
 All notable changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-06-26
+
+Stable SDK release (UAP wire format 1.0). Version bumped from the
+premature PyPI `1.0.1` alpha to publish the ground-up rebuild.
+
 ## [1.0.0] — 2026-06-04
 
 This is a ground-up rebuild and the first **stable** release.

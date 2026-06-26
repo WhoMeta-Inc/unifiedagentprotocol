@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unified-agent-protocol"
-version = "1.0.0"
+version = "1.1.0"
 description = "Unified Agent Protocol — Universal interoperability layer for AI agents and tools"
 readme = "README.md"
 requires-python = ">=3.10"
