@@ -107,6 +107,29 @@ uap serve --registry-path ./registry --port 8000
 The auto-detect `bind` accepts MCP, A2A, OpenAI, Anthropic, OpenWebUI,
 LangChain, OpenAPI 3, Swagger 2 and bare UAP envelopes.
 
+## Governed directory matching
+
+The optional runtime includes a side-effect-free matcher for applications that
+project tenant, availability, capacity and evaluation data into UAP Agent
+metadata:
+
+```python
+from unifiedagentprotocol.runtime import match_agents
+
+candidates = match_agents(
+    registry,
+    tenant_id="tenant-a",
+    required_capabilities=["research", "evidence"],
+    delegation_chain=["urn:uap:agent:requester"],
+)
+```
+
+Matching fails closed for missing tenant/availability/capacity metadata, avoids
+agents already in the delegation chain, and excludes external agents unless
+they are both explicitly requested and marked approved. It does not create a
+task or open an external boundary; the embedding application remains
+responsible for authorization, budget/HITL policy and source-owned audit.
+
 ## Architecture
 
 ```

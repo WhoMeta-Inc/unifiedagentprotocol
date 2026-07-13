@@ -6,6 +6,7 @@ Importing from this package requires the ``[runtime]`` extra:
 
     pip install unified-agent-protocol[runtime]
 """
+from .directory import DirectoryMatch, match_agents
 from .server import create_app
 
-__all__ = ["create_app"]
+__all__ = ["DirectoryMatch", "create_app", "match_agents"]
