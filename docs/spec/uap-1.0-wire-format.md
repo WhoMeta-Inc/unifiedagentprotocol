@@ -26,6 +26,17 @@ Every `Tool`, `Agent`, and `Manifest` MUST carry a globally unique `id`
 in URN form: `urn:uap:<kind>:<slug>` (slug = RFC 5234 unreserved,
 lowercase). Optionally a `uri` for HTTP-resolvable instances.
 
+### 2.1 Runtime task envelope
+
+A persistent A2A runtime MAY accept the governed `agent.task` message defined by
+`unifiedagentprotocol.runtime.TaskEnvelope`. It is distinct from the definition
+`Envelope`: the message adds an approved `connection_id`, external `tenant_id`,
+nonce and short expiry. Its `id` is `urn:uap:task:<slug>` and its Ed25519 signature
+covers `canonical_statement()` (all routing/security fields plus the bounded task
+payload, excluding the signature). Receivers MUST bind the connection to a stored
+producer URN, tenant, public key and endpoint allowlist, persist the nonce before
+acceptance, and reject unknown fields. A valid signature alone never grants auto-start.
+
 ## 3. Versioning
 
 - `uap_version`: the wire-format version (this document).

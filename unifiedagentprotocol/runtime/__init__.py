@@ -8,5 +8,12 @@ Importing from this package requires the ``[runtime]`` extra:
 """
 from .directory import DirectoryMatch, match_agents
 from .server import create_app
+from .task_envelope import AgentTaskPayload, TaskEnvelope
 
-__all__ = ["DirectoryMatch", "create_app", "match_agents"]
+__all__ = [
+    "AgentTaskPayload",
+    "DirectoryMatch",
+    "TaskEnvelope",
+    "create_app",
+    "match_agents",
+]
